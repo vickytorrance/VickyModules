@@ -1,0 +1,8 @@
+# Byte-compiled Python files
+*.pyc
+
+# Temporary data files
+*.pickle
+
+# Output file
+output_sequences.txt
