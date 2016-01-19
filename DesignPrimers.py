@@ -2,6 +2,7 @@ __author__ = 'victoriatorrance'
 
 
 import Primers
+# Consider using json instead of pickle: http://www.benfrederickson.com/dont-pickle-your-data/
 import pickle
 from intermine.webservice import Service
 import readingAPEfunctions as AP
@@ -51,12 +52,16 @@ if PrimerTypeAns == 'a' or PrimerTypeAns == 'b' :
     elif ans_PrimerPosition == 'c':
         PrimerPosition = 'ORF'
 
+# What happens if user specifies something other than a,b or c?  Could put a final else here to deal with that.
+
 if PrimerTypeAns == 'b':
     writeAPE = raw_input('Create an APE file of the PCR product? y/n\n').lower()
     plas = raw_input('If cloning the product into a vector would you like an APE file of the PCR product in your plasmid? y/n\n').lower()
+    # What happens if user specifies something besides y/n?  
 
 if PrimerPosition == 'Promoter' or PrimerPosition == 'Flanking' or PrimerPosition == 'ORF':
     direction = raw_input('Do you want the insert in the opposite direction? y/n\n').lower()
+    # What happens if user specifies something besides y/n?
 
 genes = open(r'input')
 promoters = open(r"yeast promoter sizes from YPA.txt")
@@ -79,8 +84,10 @@ query.add_constraint("Gene", "IN", "Verified_ORFs", code = "B")
 query.add_constraint("flankingRegions.direction", "=", "both", code = "C")
 query.add_constraint("flankingRegions.distance", "=", "1.0kb", code = "A")
 query.add_constraint("flankingRegions.includeGene", "=", "true", code = "D")
-'''
 
+# I needed to uncomment the section below to get script to run
+# Maybe check whether tempthings.pickle exists (os.path.isfile("tempthings.pickle"))
+# if so, carry on, if not, create it first then carry on?
 mydict2 = {}
 # created a dict which contains the systematic gene name as the key and then
 # item[0] = short gene name, item[1] = the upstream sequence, item[2] = the ORF sequence
@@ -95,7 +102,7 @@ for row in query.rows():
 
 with open('tempthings.pickle', 'wb') as handle:
   pickle.dump(mydict2, handle)
-'''
+
 promoterdict = {}
 
 with open('tempthings.pickle', 'rb') as handle:
@@ -169,7 +176,9 @@ elif PrimerPosition =='Flanking':
             print str(mydict[gene][0]), gene, primers
             g.write(str(mydict[gene][0])+'\t'+ gene +'\t'+ str(primers) + '\n')
 
-
+# Need to explain to user that ORFs of interest are specified in input file?
+# Need to give input file an extension (e.g. .txt) so that is is more obvious to users that they can edit it?
+# Can you think how to allow users to specify standard gene names instead of/as well as systematic ones?
 elif PrimerPosition =='ORF':
         for gene1 in genes:
             gene = gene1.rstrip('\n')
@@ -217,3 +226,6 @@ elif PrimerPosition == 'TAG':
             print str(mydict[gene][0]),gene,primers
             g.write(str(mydict[gene][0])+'\t'+ gene +'\t'+ str(primers) + '\n')
 
+# Have to close file to be able to see contents.
+# What is the significance of the HDA3 and BRE4 genes in the output file?  Need to explain input file to user.
+g.close()
